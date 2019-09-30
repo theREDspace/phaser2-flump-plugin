@@ -1,9 +1,15 @@
-import { EMPTY_KEYFRAME, EMPTY_LABEL } from "../../constants/Constants";
+import { 
+    EMPTY_KEYFRAME, 
+    EMPTY_LABEL 
+} from "../../constants/Constants";
 
 /**
  * KeyframeData - TODO: desciption
  */
 export class KeyframeData {
+    get isEmpty() { return this.ref === EMPTY_KEYFRAME; }
+    get rotation() { return this.skewX; }
+
     constructor(json) {
         if (json.index === undefined) {
             throw new Error("Keyframe is missing index field.");

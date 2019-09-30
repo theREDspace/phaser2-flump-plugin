@@ -58,6 +58,11 @@ export class Library {
         this.game = undefined;
         this.data = undefined;
         this.symbolAtlasMap = undefined;
+
+        for (let key in this.movieMap) {
+            this.movieMap[key].destroy();
+        }
+        this.movieMap = undefined;
     }
 
     /**
