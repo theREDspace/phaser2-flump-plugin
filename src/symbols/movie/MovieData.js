@@ -51,8 +51,6 @@ export class MovieData {
 
         // Generate the lists of frame labels from each keyframe within the list of layers.
         this.generateFrameLabels();
-
-        console.log(this);
     }
 
     /**

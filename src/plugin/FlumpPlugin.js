@@ -45,11 +45,26 @@ export class FlumpPlugin extends Phaser.Plugin {
     }
 
     /**
+     * Searches all libraries for the first instance of the symbol and returns an instance of it.
+     * @param {string} key Symbol key to search for.
+     */
+    createSymbol(key) {
+        // Search for a library that contains a symbol for the provided key.
+        for (let i in this.libraries) {
+            if (this.libraries[i].hasSymbol(key)) {
+                return this.libraries[i].create(key);
+            }
+        }
+        throw new Error(`Cannot find a library that contains a symbol for '${key}'.`);
+    }
+
+    /**
      * Creates a new symbol from the specified library.
+     * Passing in 'undefined' for the symbol key will return an empty image symbol from the library.
      * @param {string} library Library key
      * @param {string} key Symbol key
      */
-    createSymbol(library, key) {
+    createSymbolFrom(library, key) {
         if (this.libraries[library] === undefined) {
             throw new Error(`Flump library ${library} does not exist. Be sure to call 'game.flump.addLibrary("${library}")' before attempting to create a symbol.`);
         }

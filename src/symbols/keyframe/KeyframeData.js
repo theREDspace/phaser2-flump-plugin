@@ -42,7 +42,7 @@ export class KeyframeData {
         /**
          * @type {number}
          */
-        this.ease = json.ease || 1;
+        this.ease = json.ease || 0;
         /**
          * @type {boolean}
          */
