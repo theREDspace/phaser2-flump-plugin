@@ -5,6 +5,18 @@ export class Symbol extends Phaser.Image {
     constructor(game, x, y, key, frame) {
         super(game, x, y, key, frame);
         /**
+         * @type {string}
+         */
+        this.symbolType = undefined;
+        /**
+         * @type {string}
+         */
+        this.symbolKey = undefined;
+        /**
+         * @type {string}
+         */
+        this.symbolLibrary = undefined;
+        /**
          * @type {Phaser.Point}
          */
         this.skew = new Phaser.Point(0, 0);

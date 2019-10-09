@@ -2,6 +2,7 @@ import { Movie } from "../movie/Movie";
 import { LayerData } from "./LayerData";
 import { KeyframeData } from "../keyframe/KeyframeData";
 import { EMPTY_KEYFRAME, MOVIE_SYMBOL_TYPE } from "../../constants/Constants";
+import { Symbol } from "../Symbol";
 
 /**
  * Layer - TODO: desciption
@@ -33,7 +34,7 @@ export class Layer {
          * @type {Movie}
          */
         this.movie = movie;
-
+        
         /**
          * @type {Phaser.Game}
          */
@@ -45,12 +46,12 @@ export class Layer {
         this.data = undefined;
 
         /**
-         * @type {Movie | FlumpSymbol}
+         * @type {Movie | Symbol}
          */
         this.currentSymbol = undefined;
 
         /**
-         * @type {Array.<FlumpSymbol | Movie}
+         * @type {Array.<Symbol | Movie}
          */
         this.symbols = [];
 
@@ -122,7 +123,6 @@ export class Layer {
 
                 let symbol;
                 if (i > 0 && this.keyframes[i - 1].ref === keyframe.ref) {
-                    // Reuse this symbol.
                     symbol = this.symbols[i - 1];
                 }
                 else {
@@ -133,7 +133,7 @@ export class Layer {
                     }
                     else {
                         symbol = this.game.flump.createSymbolFrom(this.library, keyframe.ref);
-                        if (symbol.flumpSymbolType === MOVIE_SYMBOL_TYPE) {
+                        if (symbol.symbolType === MOVIE_SYMBOL_TYPE) {
                             symbol.setParentMovie(this.movie);
                         }
                     }
@@ -185,7 +185,7 @@ export class Layer {
         if (this.currentSymbol !== symbol) {;
             this.currentSymbol.visible = false;
 
-            if (symbol.flumpSymbolType === MOVIE_SYMBOL_TYPE) {
+            if (symbol.symbolType === MOVIE_SYMBOL_TYPE) {
                 symbol.addedToLayer();
             }
 
@@ -250,10 +250,29 @@ export class Layer {
     }
 
     cleanUp() {
-        this.symbols.forEach(symbol => {
-            this.game.flump.libraries[this.library].storeSymbol(symbol)
+        // Push current symbol into the list to make sure it gets properly cleaned up with everything else.
+        this.symbols.push(this.currentSymbol); 
+
+        while (this.symbols.length > 0) {
+            const symbol = this.symbols.shift();
+
+            for (let i = this.symbols.length; i >= 0; --i) {
+                if (this.symbols[i] === symbol) {
+                    this.symbols.splice(i, 1);
+                }
+            }
+
+            if (symbol.symbolType === MOVIE_SYMBOL_TYPE) {
+                // symbol.cleanUp();
+            }
+
             this.movie.removeChild(symbol);
-        });
-        this.symbols = [];
+            this.game.flump.libraries[this.library].storeSymbol(symbol);
+        }
+
+        this.position = 0;
+        this.disabled = false;
+        this.data = undefined;
+        this.currentSymbol = undefined;
     }
 }

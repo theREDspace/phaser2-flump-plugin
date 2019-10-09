@@ -46,7 +46,7 @@ export class Library {
 
         /**
          * Storage for unused symbols.
-         * @type {Object.<string, Array.<FlumpSymbol> | Object.<string, Array.<FlumpSymbol | Movie>>>}
+         * @type {Object.<string, Array.<Symbol> | Object.<string, Array.<Symbol | Movie>>>}
          */
         this.symbolPools = { 
             [EMPTY_SYMBOL_TYPE]: [],
@@ -87,6 +87,7 @@ export class Library {
      */
     destroy(unloadDependencies = true) {
         if (this.isDestroyed) {
+            // Ideally we will never get here, however throw an error in case the user tries to use the library after it was removed from the plugin.
             throw new Error(`${this.key} has already been destroyed.`);
         }
 
@@ -121,10 +122,11 @@ export class Library {
     /**
      * Creates either a Movie or Image symbol from this library.
      * @param {string} key Symbol key
-     * @return {Movie | FlumpSymbol}
+     * @return {Movie | Symbol}
      */
     create(key) {
         if (this.isDestroyed) {
+            // Ideally we will never get here, however throw an error in case the user tries to use the library after it was removed from the plugin.
             throw new Error(`${this.key} has been destroyed and cannot be used to make new symbols.`);
         }
 
@@ -141,14 +143,50 @@ export class Library {
     }
 
     /**
-     * Check to see if this library containers a symbol for the provided key.
+     * Check to see if this library contains a symbol for the provided key.
      * @param {string} key 
      */
     hasSymbol(key) {
         if (this.isDestroyed) {
+            // Ideally we will never get here, however throw an error in case the user tries to use the library after it was removed from the plugin.
             throw new Error(`${this.key} has been destroyed and has no symbols.`);
         }
-        return this.imageAtlasMap[key] !== undefined || this.movieMap[key] !== undefined;
+        return this.hasImageSymbol(key) || this.hasMovieSymbol(key);
+    }
+
+    /**
+     * Check to see if this library contains the provided Movie key.
+     * @param {string} key 
+     */
+    hasMovieSymbol(key) {
+        if (this.isDestroyed) {
+            // Ideally we will never get here, however throw an error in case the user tries to use the library after it was removed from the plugin.
+            throw new Error(`${this.key} has been destroyed and has no symbols.`);
+        }
+        return this.movieMap[key] !== undefined;
+    }
+
+    /**
+     * Check to see if this library contains the provided Image key.
+     * @param {string} key 
+     */
+    hasImageSymbol(key) {
+        if (this.isDestroyed) {
+            // Ideally we will never get here, however throw an error in case the user tries to use the library after it was removed from the plugin.
+            throw new Error(`${this.key} has been destroyed and has no symbols.`);
+        }
+        return this.imageAtlasMap[key] !== undefined;
+    }
+
+    /**
+     * Returns the MovieData object for the provided Movie key.
+     * @param {string} key 
+     */
+    getMovieData(key) {
+        if (!this.hasMovieSymbol(key)) {
+            throw new Error(`${this.key} does not contain MovieData for ${key}.`);
+        }
+        return this.movieMap[key];
     }
 
     /**
@@ -158,10 +196,11 @@ export class Library {
      */
     getFreeSymbol(type, key) {
         if (this.isDestroyed) {
+            // Ideally we will never get here, however throw an error in case the user tries to use the library after it was removed from the plugin.
             throw new Error(`${this.key} has been destroyed and has no symbols.`);
         }
         /**
-         * @type {FlumpSymbol | Movie}
+         * @type {Symbol | Movie}
          */
         let symbol;
 
@@ -192,7 +231,7 @@ export class Library {
                         if (this.imageAtlasMap[key] === undefined) {
                             throw new Error(`Cannot find image symbol ${key} in ${this.key}.`);
                         }
-                        symbol = new Symbol(this.game, 0, 0, this.imageAtlasMap[key], key);
+                        symbol = new Symbol(this.game, 0, 0, this.imageAtlasMap[key], key); // Allocation
                     }
                     else {
                         if (this.movieMap[key] === undefined) {
@@ -207,10 +246,9 @@ export class Library {
                 throw new Error(`Cannot get the symbol ${key} in ${this.key}.`);
         }
 
-        // Inject information for this symbol object that will allow this library to manage it.
-        symbol.flumpSymbolType = type;
-        symbol.flumpSymbolKey = symbolKey;
-        symbol.flumpSymbolLibrary = this.key;
+        symbol.symbolType = type;
+        symbol.symbolKey = symbolKey;
+        symbol.symbolLibrary = this.key;
 
         // Return the symbol.
         return symbol;
@@ -219,37 +257,35 @@ export class Library {
     /**
      * Store the provided symbol in this library.
      * Only symbols created from this library using the Library::create() function can be store in this library.
-     * @param {FlumpSymbol | Movie} symbol 
+     * @param {Symbol | Movie} symbol 
      */
     storeSymbol(symbol) {
         if (this.isDestroyed) {
+            // Ideally we will never get here, however throw an error in case the user tries to use the library after it was removed from the plugin.
             throw new Error(`${this.key} has been destroyed and no longer can store symbols. Use Symbol::destroy() instead.`);
         }
-        if (symbol.flumpSymbolLibrary === undefined || symbol.flumpSymbolLibrary !== this.key) {
+        if (symbol.symbolLibrary === undefined || symbol.symbolLibrary !== this.key) {
             throw new Error('The provided symbol does not belong to this library.');
         }
 
-        const type = symbol.flumpSymbolType;
+        const type = symbol.symbolType;
         switch (type) {
             case EMPTY_SYMBOL_TYPE:
-                if (this.symbolPools[EMPTY_SYMBOL_TYPE].indexOf(symbol) < 0) {
-                    this.symbolPools[EMPTY_SYMBOL_TYPE].push(symbol);
+                if (this.symbolPools[EMPTY_SYMBOL_TYPE].indexOf(symbol) >= 0) {
+                    throw new Error("Attempting to store a symbol that is already in storage. Symbols in storages should not be referenced.");
                 }
+                this.symbolPools[EMPTY_SYMBOL_TYPE].push(symbol);
                 break;
 
             case MOVIE_SYMBOL_TYPE:
             case IMAGE_SYMBOL_TYPE:
-                const key = symbol.flumpSymbolKey
+                const key = symbol.symbolKey
 
                 this.symbolPools[type][key] = this.symbolPools[type][key] || [];
-                if (this.symbolPools[type][key].indexOf(symbol) < 0) {
-                    this.symbolPools[type][key].push(symbol);
+                if (this.symbolPools[type][key].indexOf(symbol) >= 0) {
+                    throw new Error("Attempting to store a symbol that is already in storage. Symbols in storages should not be referenced.");
                 }
-
-                if (type === MOVIE_SYMBOL_TYPE) {
-                    symbol.cleanUp();
-                }
-
+                this.symbolPools[type][key].push(symbol);
                 break;
 
             default: 

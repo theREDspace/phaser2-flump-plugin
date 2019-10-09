@@ -40,7 +40,7 @@ export class LayerData {
         /**
          * @type {boolean}
          */
-        this.flipbook = json.flipbook === true; // Explicitly check for 'true' in case the json field is undefined.
+        this.flipbook = json.flipbook || false; 
 
         // Verify the layer data has a keyframes list.
         if (json.keyframes === undefined) {

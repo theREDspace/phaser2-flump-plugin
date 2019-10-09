@@ -116,12 +116,27 @@ export class Movie extends Symbol {
         /**
          * @type {string}
          */
+        this.fallbackLoop = undefined;
+
+        /**
+         * @type {string}
+         */
         this.state = PLAYING
 
         /**
          * @type {Phaser.Signal}
          */
         this.labelEvents = new Phaser.Signal();
+
+        /**
+         * @type {Phaser.Signal}
+         */
+        this.playbackComplete = new Phaser.Signal();
+
+        /**
+         * @type {Phaser.Signal}
+         */
+        this.playbackLoop = new Phaser.Signal();
 
         // Setup initial state of the Movie.
         this.setup(data).addedToLayer();
@@ -153,6 +168,16 @@ export class Movie extends Symbol {
     }
 
     /**
+     * Changes the animation this Movie is playing.
+     * @param {string} key 
+     */
+    switchMovieTo(key) {
+        if (this.game.flump.libraries[this.library].hasMovieSymbol(key)) {
+            this.setup(this.game.flump.libraries[this.library].getMovieData(key));
+        }
+    }
+
+    /**
      * Returns true if the label exists in on this Movie.
      * @param {string} label 
      */
@@ -166,7 +191,7 @@ export class Movie extends Symbol {
      */
     getFrameOfLabel(label) {
         for (let i = 0; i < this.labels.length; i++) {
-            if (this.labels.indexOf(label) >= 0) {
+            if (this.labels[i].indexOf(label) >= 0) {
                 return i;
             }
         }
@@ -176,16 +201,35 @@ export class Movie extends Symbol {
     /**
      * Loop this movie.
      */
-    loop() {
+    loop(key, restart = true) {
+        this.fallbackLoop = undefined;
+
+        if ((!key || key === this.name) && restart) {
+            this.addedToLayer();
+        }
+        else if (key && key !== this.name) {
+            this.switchMovieTo(key);
+        }
+
         this.state = PLAYING;
         this.stopFrame = NO_FRAME;
+
         return this;
     }
 
     /**
      * Plays the Movie to the last frame once.
      */
-    playOnce() {
+    playOnce(key, restart = true, fallbackLoop = undefined) {
+        this.fallbackLoop = fallbackLoop;
+
+        if ((!key || key === this.name) && restart) {
+            this.addedToLayer();
+        }
+        else if (key && key !== this.name) {
+            this.switchMovieTo(key);
+        }
+
         return this.playTo(LAST_FRAME);
     }
 
@@ -268,7 +312,7 @@ export class Movie extends Symbol {
 
             if (recursive) {
                 this.layers.forEach(layer => {
-                    if (layer.currentSymbol.flumpSymbolType === MOVIE_SYMBOL_TYPE) {
+                    if (layer.currentSymbol.symbolType === MOVIE_SYMBOL_TYPE) {
                         layer.currentSymbol.goToInternal(frame, recursive);
                     }
                 });
@@ -301,6 +345,10 @@ export class Movie extends Symbol {
             const actualPlayTime = this.playTime;
             if (this.playTime >= this.duration) {
                 this.playTime %= this.duration;
+
+                if (!this.isManagedByParent) {
+                    this.playbackLoop.dispatch();
+                }
             }
 
             let nextFrame = Math.round(this.playTime * this.frameRate);
@@ -318,6 +366,14 @@ export class Movie extends Symbol {
                 if (framesElapsed >= framesRemaining) {
                     this.state = STOPPED;
                     nextFrame = this.stopFrame;
+
+                    if (this.fallbackLoop !== undefined) {
+                        this.loop(this.fallbackLoop, true);
+                    }
+
+                    if (!this.isManagedByParent) {
+                        this.playbackComplete.dispatch();
+                    }
                 }
             }
 
@@ -325,7 +381,7 @@ export class Movie extends Symbol {
         }
 
         for (let i = 0; i < this.layers.length; i++) {
-            if (this.layers[i].currentSymbol.flumpSymbolType === MOVIE_SYMBOL_TYPE) {
+            if (this.layers[i].currentSymbol.symbolType === MOVIE_SYMBOL_TYPE) {
                 this.layers[i].currentSymbol.advanceTime(dt);
             }
         }
@@ -353,7 +409,7 @@ export class Movie extends Symbol {
      * Toggle a specific layer on the Movie. 
      * @param {string} name 
      * @param {boolean} toggle 
-     * @returns {FlumpSymbol | Movie} Returns the current layer sumbol.
+     * @returns {Symbol | Movie} Returns the current layer sumbol.
      */
     toggleLayer(name, toggle) {
         for (let i = 0; i < this.layers.length; i++) {
@@ -410,7 +466,7 @@ export class Movie extends Symbol {
 
         let replaceSymbol = false;
         if (childLayerIndex >= 0) {
-            if (child.flumpSymbolType === MOVIE_SYMBOL_TYPE) {
+            if (child.symbolType === MOVIE_SYMBOL_TYPE) {
                 // Clear the nested Movie's parent reference.
                 child.setParentMovie();
             }
@@ -447,7 +503,7 @@ export class Movie extends Symbol {
      */
     setup(data) {
         if (this.data !== undefined) {
-            this.cleanUpLayers();
+            this.cleanUp();
         }
         this.data = data;
         
@@ -464,6 +520,8 @@ export class Movie extends Symbol {
             this.duration = this.frameCount / this.frameRate;
             this.updateFrame(0, 0);
         }
+        
+        this.addedToLayer();
         return this;
     }
 
@@ -473,9 +531,9 @@ export class Movie extends Symbol {
      */
     cleanUp() {
         while (this.layers.length > 0) {
-            this.layers[0].cleanUp();
-            this.layerPool.push(this.layers[0]);
-            this.layers.shift();
+            const layer = this.layers.shift();
+            layer.cleanUp();
+            this.layerPool.push(layer);
         }
     }
 
@@ -491,7 +549,8 @@ export class Movie extends Symbol {
      * Sets the initial state of the Movie.
      */
     addedToLayer() {
-        this.goTo(0);
+        // this.goTo(0);
+        this.goToInternal(0, true);
         this.skipAdvanceTime = true;
     }
 
