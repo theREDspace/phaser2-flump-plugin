@@ -374,24 +374,25 @@ export class Movie extends Symbol {
     goToInternal(frame, recursive) {
         if (this.isUpdatingFrame) {
             this.pendingGoToFrame = frame;
+            return this;
         }
-        else {
-            let nextFrame = frame;
-            if (nextFrame >= this.frameCount) {
-                nextFrame = this.frameCount;
-            }
-
-            this.playTime = nextFrame / this.frameRate;
-            this.updateFrame(nextFrame, 0);
-
-            if (recursive) {
-                this.layers.forEach(layer => {
-                    if (layer.currentSymbol.symbolType === MOVIE_SYMBOL_TYPE) {
-                        layer.currentSymbol.goToInternal(frame, recursive);
-                    }
-                });
-            }
+        
+        let nextFrame = frame;
+        if (nextFrame >= this.frameCount) {
+            nextFrame = this.frameCount;
         }
+
+        this.playTime = nextFrame / this.frameRate;
+        this.updateFrame(nextFrame, 0);
+
+        if (recursive) {
+            this.layers.forEach(layer => {
+                if (layer.currentSymbol.symbolType === MOVIE_SYMBOL_TYPE) {
+                    layer.currentSymbol.goToInternal(frame, recursive);
+                }
+            });
+        }
+
         return this;
     }
 

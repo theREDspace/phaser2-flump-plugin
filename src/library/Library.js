@@ -76,9 +76,9 @@ export class Library {
          * @version 1.0
          */
         this.symbolPools = { 
-            [EMPTY_SYMBOL_TYPE]: [],
-            [IMAGE_SYMBOL_TYPE]: [],
-            [MOVIE_SYMBOL_TYPE]: {}
+            [EMPTY_SYMBOL_TYPE]: [], // Symbols with no loaded textures.
+            [IMAGE_SYMBOL_TYPE]: [], // Symbols with loaded textures.
+            [MOVIE_SYMBOL_TYPE]: []  // Symbols used for playing Movies.
         };
 
         // Verify the library.json file for this library has been loaded to cache.
@@ -139,10 +139,8 @@ export class Library {
         while (this.symbolPools[IMAGE_SYMBOL_TYPE].length > 0) {
             this.symbolPools[IMAGE_SYMBOL_TYPE].shift().destroy();
         }
-        for (let key in this.symbolPools[MOVIE_SYMBOL_TYPE]) {
-            while (this.symbolPools[MOVIE_SYMBOL_TYPE][key].length > 0) {
-                this.symbolPools[IMAGE_SYMBOL_TYPE][key].shift().destroy();
-            }
+        while (this.symbolPools[MOVIE_SYMBOL_TYPE].length > 0) {
+            this.symbolPools[MOVIE_SYMBOL_TYPE].shift().destroy();
         }
         this.symbolPools = undefined
 
@@ -251,43 +249,29 @@ export class Library {
 
         const symbolKey = key || EMPTY_SYMBOL_TYPE;
 
-        // Determine which type of symbol is to be returned.
-        switch (type) {
-            case EMPTY_SYMBOL_TYPE:
-            case IMAGE_SYMBOL_TYPE:
-                this.symbolPools[type] = this.symbolPools[type] || [];
-                if (this.symbolPools[type].length > 0) {
-                    symbol = this.symbolPools[type].shift();
-                }
-                else {
-                    symbol = new Symbol(this.game); // Allocation
-                }
+        if (type !== EMPTY_SYMBOL_TYPE && type !== IMAGE_SYMBOL_TYPE && type !== MOVIE_SYMBOL_TYPE) {
+            throw new Error(`Cannot get the symbol ${key} in ${this.key}.`);
+        }
+        
+        this.symbolPools[type] = this.symbolPools[type] || [];
+        if (this.symbolPools[type].length > 0) {
+            symbol = this.symbolPools[type].shift();
+        }
+        else {
+            if (type === MOVIE_SYMBOL_TYPE) {
+                symbol = new Movie(this.game, this.movieMap[key], this.frameRate); // Allocation
+            }
+            else {
+                symbol = new Symbol(this.game); // Allocation
+            }
+        }
 
-                // This is symbol is an image symbol, then load the texture into it.
-                if (type === IMAGE_SYMBOL_TYPE) {
-                    symbol.loadTexture(this.imageAtlasMap[key], key);
-                }
-                break;
-
-            case MOVIE_SYMBOL_TYPE:
-                this.symbolPools[type][key] = this.symbolPools[type][key] || [];
-
-                // Check and return from the pools.
-                if (this.symbolPools[type][key].length > 0) {
-                    symbol = this.symbolPools[type][key].shift();
-                    symbol.setup(this.movieMap[key]);
-                }
-                else if (this.movieMap[key] !== undefined) {
-                    // No free Movie for type 'key', create a new one.
-                    symbol = new Movie(this.game, this.movieMap[key], this.frameRate); // Allocation
-                }
-                else {
-                    throw new Error(`Cannot find movie symbol ${key} in ${this.key}.`);
-                }
-                break;
-
-            default: 
-                throw new Error(`Cannot get the symbol ${key} in ${this.key}.`);
+        // This is symbol is an image symbol, then load the texture into it.
+        if (type === IMAGE_SYMBOL_TYPE) {
+            symbol.loadTexture(this.imageAtlasMap[key], key);
+        }
+        else if (type === MOVIE_SYMBOL_TYPE) {
+            symbol.setup(this.movieMap[key])
         }
 
         symbol.symbolType = type;
@@ -302,7 +286,7 @@ export class Library {
      * Store the provided symbol in this library.
      * Only symbols created from this library using the Library::create() function can be store in this library.
      * @param {Symbol | Movie} symbol 
-     * @version 1.0
+     * @version 1.0 - Added
      */
     storeSymbol(symbol) {
         if (this.isDestroyed) {
@@ -314,27 +298,14 @@ export class Library {
         }
 
         const type = symbol.symbolType;
-        switch (type) {
-            case EMPTY_SYMBOL_TYPE:
-            case IMAGE_SYMBOL_TYPE:
-                if (this.symbolPools[type].indexOf(symbol) >= 0) {
-                    throw new Error("Attempting to store a symbol that is already in storage. Symbols in storages should not be referenced.");
-                }
-                this.symbolPools[type].push(symbol);
-                break;
-
-            case MOVIE_SYMBOL_TYPE:
-                const key = symbol.symbolKey
-                this.symbolPools[type][key] = this.symbolPools[type][key] || [];
-                if (this.symbolPools[type][key].indexOf(symbol) >= 0) {
-                    throw new Error("Attempting to store a symbol that is already in storage. Symbols in storages should not be referenced.");
-                }
-                this.symbolPools[type][key].push(symbol);
-                break;
-
-            default: 
-                throw new Error(`Cannot store the symbol ${key} in ${this.key}.`);
+        if (type !== EMPTY_SYMBOL_TYPE && type !== IMAGE_SYMBOL_TYPE && type !== MOVIE_SYMBOL_TYPE) {
+            throw new Error(`Cannot store the symbol ${symbol.symbolKey} in ${this.key}.`);
         }
+        
+        if (this.symbolPools[type].indexOf(symbol) >= 0) {
+            throw new Error("Attempting to store a symbol that is already in storage. Symbols in storages should not be referenced.");
+        }
+        this.symbolPools[type].push(symbol);
     }
 
     /**

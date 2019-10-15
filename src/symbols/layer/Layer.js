@@ -150,37 +150,38 @@ export class Layer {
             this.currentSymbol = this.game.flump.createSymbolFrom(this.library);
             this.movie.addChild(this.currentSymbol);
             this.symbolCount = 1;
+            
+            return this.drawFrame(0);
         }
-        else {
-            for (let i = 0; i < this.keyframes.length; ++i) {
-                const keyframe = this.keyframes[i];
 
-                let symbol;
-                if (i > 0 && this.keyframes[i - 1].ref === keyframe.ref) {
-                    symbol = this.symbols[i - 1];
+        for (let i = 0; i < this.keyframes.length; ++i) {
+            const keyframe = this.keyframes[i];
+
+            let symbol;
+            if (i > 0 && this.keyframes[i - 1].ref === keyframe.ref) {
+                symbol = this.symbols[i - 1];
+            }
+            else {
+                this.symbolCount++;
+
+                if (keyframe.ref === EMPTY_KEYFRAME) {
+                    symbol = this.game.flump.createSymbolFrom(this.library);
                 }
                 else {
-                    this.symbolCount++;
-
-                    if (keyframe.ref === EMPTY_KEYFRAME) {
-                        symbol = this.game.flump.createSymbolFrom(this.library);
-                    }
-                    else {
-                        symbol = this.game.flump.createSymbolFrom(this.library, keyframe.ref);
-                        if (symbol.symbolType === MOVIE_SYMBOL_TYPE) {
-                            symbol.setParentMovie(this.movie);
-                        }
+                    symbol = this.game.flump.createSymbolFrom(this.library, keyframe.ref);
+                    if (symbol.symbolType === MOVIE_SYMBOL_TYPE) {
+                        symbol.setParentMovie(this.movie);
                     }
                 }
-
-                this.symbols.push(symbol);
-                symbol.visible = false;
-                this.movie.addChild(symbol);
             }
 
-            this.currentSymbol = this.symbols[0];
-            this.currentSymbol.visible = true;
+            this.symbols.push(symbol);
+            symbol.visible = false;
+            this.movie.addChild(symbol);
         }
+
+        this.currentSymbol = this.symbols[0];
+        this.currentSymbol.visible = true;
 
         return this.drawFrame(0);
     }

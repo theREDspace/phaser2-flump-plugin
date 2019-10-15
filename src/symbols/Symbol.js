@@ -53,9 +53,7 @@ export class Symbol extends Phaser.Image {
         if (this.symbolType === MOVIE_SYMBOL_TYPE) {
             return this.calculateTransform(parent);
         }
-        else {
-            return super.displayObjectUpdateTransform(parent);
-        }
+        return super.displayObjectUpdateTransform(parent);
     }
 
     /**
@@ -68,9 +66,7 @@ export class Symbol extends Phaser.Image {
         if (this.symbolType === IMAGE_SYMBOL_TYPE) {
             return this.calculateTransform(parent);
         }
-        else {
-            return super.updateTransform(parent);
-        }
+        return super.updateTransform(parent);
     }
 
     /**
@@ -84,7 +80,7 @@ export class Symbol extends Phaser.Image {
             return this;
         }
 
-        var p = this.parent;
+        let p = this.parent;
 
         if (parent) {
             p = parent;
@@ -94,11 +90,11 @@ export class Symbol extends Phaser.Image {
         }
 
         // create some matrix refs for easy access
-        var pt = p.worldTransform;
-        var wt = this.worldTransform;
+        const pt = p.worldTransform;
+        const wt = this.worldTransform;
 
         // temporary matrix variables
-        var a, b, c, d, tx, ty;
+        let a, b, c, d, tx, ty;
 
         // so if rotation is between 0 then we can simplify the multiplication process..
         if (this.rotation % PIXI.PI_2 || this.skew.x || this.skew.y) {
