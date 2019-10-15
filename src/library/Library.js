@@ -8,50 +8,77 @@ import {
 import { Symbol } from "../symbols/Symbol";
 
 /**
- * Library - TODO: desciption
+ * Flump library manager that stores symbol information for creating Flump movies. Symbol data stored in this library
+ * is unique to the loaded 'library.json' file. All symbol names within this library should be unique to avoid naming collisions.
+ * 
+ * A library also pools Symbol objects that are not currently in use. When a new Movie symbol is requested from the library,
+ * symbols will be pulled from the pools before new ones are created. When a Movie symbol is cleaned up, all of its symbols are
+ * returned to the library and are stored for future use.
+ * 
+ * When a library is destroyed, all stored symbols are also destroyed. Any attempt to store symbols after the library has been
+ * destroyed will result in an error. Existing Movie symbols may still play after the library is destroyed, however changing 
+ * the animation in the Movie will result in the Movie attempting to access the library. It is best practice to only destroy 
+ * a library when you know it will not be needed, and destroying any symbols that may still be living outside of the library 
+ * still in use.
+ * 
+ * @version 1.0
  */
 export class Library {
     /**
      * @type {number}
+         * @readonly
+     * @version 1.0
      */
     get frameRate() { return this.data.frameRate || 0; }
 
     constructor(game, key) {
         /**
          * @type {Phaser.Game}
+         * @readonly
+         * @version 1.0
          */
         this.game = game;
 
         /**
          * @type {string}
+         * @readonly
+         * @version 1.0
          */
         this.key = key;
 
         /**
          * @type {boolean}
+         * @readonly
+         * @version 1.0
          */
         this.isDestroyed = false;
 
         /**
          * A map of what symbol belongs to which atlas png.
          * @type {Object.<string, string>}
+         * @readonly
+         * @version 1.0
          */
         this.imageAtlasMap = {};
 
         /**
          * A list of atlas names for this library.
          * @type {Array.<string>}
+         * @readonly
+         * @version 1.0
          */
         this.atlases = []
 
         /**
          * Storage for unused symbols.
          * @type {Object.<string, Array.<Symbol> | Object.<string, Array.<Symbol | Movie>>>}
+         * @readonly
+         * @version 1.0
          */
         this.symbolPools = { 
             [EMPTY_SYMBOL_TYPE]: [],
-            [MOVIE_SYMBOL_TYPE]: {},
-            [IMAGE_SYMBOL_TYPE]: {}
+            [IMAGE_SYMBOL_TYPE]: [],
+            [MOVIE_SYMBOL_TYPE]: {}
         };
 
         // Verify the library.json file for this library has been loaded to cache.
@@ -59,7 +86,11 @@ export class Library {
             throw new Error(`Cannot find library JSON for ${key} in game cache.`);
         }
 
-        /** @type {Object.<string, any} */
+        /** 
+         * @type {Object.<string, any}
+         * @readonly
+         * @version 1.0
+         */
         this.data = this.game.cache.getJSON(key);
 
         // Verify the movies list exits in the library's data.
@@ -69,6 +100,8 @@ export class Library {
 
         /**
          * @type {Object.<string, MovieData}
+         * @readonly
+         * @version 1.0
          */
         this.movieMap = {};
         this.data.movies.forEach((movie, i) => {
@@ -83,9 +116,11 @@ export class Library {
     }
 
     /**
-     * Destroys and cleans up this library.
+     * Destroys and cleans up this library
+     * @param {boolean} unloadDependencies
+     * @version 1.0
      */
-    destroy(unloadDependencies = true) {
+    destroy(unloadDependencies = false) {
         if (this.isDestroyed) {
             // Ideally we will never get here, however throw an error in case the user tries to use the library after it was removed from the plugin.
             throw new Error(`${this.key} has already been destroyed.`);
@@ -98,12 +133,16 @@ export class Library {
         this.movieMap = undefined;
 
         // Clean up the pooled library symbols
-        this.symbolPools[EMPTY_SYMBOL_TYPE].forEach(symbol => symbol.destroy());
-        for (let key in this.symbolPools[IMAGE_SYMBOL_TYPE]) {
-            this.symbolPools[IMAGE_SYMBOL_TYPE][key].forEach(symbol => symbol.destroy());
+        while (this.symbolPools[EMPTY_SYMBOL_TYPE].length > 0) {
+            this.symbolPools[EMPTY_SYMBOL_TYPE].shift().destroy();
+        }
+        while (this.symbolPools[IMAGE_SYMBOL_TYPE].length > 0) {
+            this.symbolPools[IMAGE_SYMBOL_TYPE].shift().destroy();
         }
         for (let key in this.symbolPools[MOVIE_SYMBOL_TYPE]) {
-            this.symbolPools[MOVIE_SYMBOL_TYPE][key].forEach(symbol => symbol.destroy());
+            while (this.symbolPools[MOVIE_SYMBOL_TYPE][key].length > 0) {
+                this.symbolPools[IMAGE_SYMBOL_TYPE][key].shift().destroy();
+            }
         }
         this.symbolPools = undefined
 
@@ -123,6 +162,7 @@ export class Library {
      * Creates either a Movie or Image symbol from this library.
      * @param {string} key Symbol key
      * @return {Movie | Symbol}
+     * @version 1.0
      */
     create(key) {
         if (this.isDestroyed) {
@@ -145,6 +185,7 @@ export class Library {
     /**
      * Check to see if this library contains a symbol for the provided key.
      * @param {string} key 
+     * @version 1.0
      */
     hasSymbol(key) {
         if (this.isDestroyed) {
@@ -157,6 +198,7 @@ export class Library {
     /**
      * Check to see if this library contains the provided Movie key.
      * @param {string} key 
+     * @version 1.0
      */
     hasMovieSymbol(key) {
         if (this.isDestroyed) {
@@ -169,6 +211,7 @@ export class Library {
     /**
      * Check to see if this library contains the provided Image key.
      * @param {string} key 
+     * @version 1.0
      */
     hasImageSymbol(key) {
         if (this.isDestroyed) {
@@ -181,6 +224,7 @@ export class Library {
     /**
      * Returns the MovieData object for the provided Movie key.
      * @param {string} key 
+     * @version 1.0
      */
     getMovieData(key) {
         if (!this.hasMovieSymbol(key)) {
@@ -193,6 +237,7 @@ export class Library {
      * Returns a free symbol from a pool, or creates a new library symbol.
      * @param {string} type 
      * @param {string} key 
+     * @version 1.0
      */
     getFreeSymbol(type, key) {
         if (this.isDestroyed) {
@@ -209,36 +254,35 @@ export class Library {
         // Determine which type of symbol is to be returned.
         switch (type) {
             case EMPTY_SYMBOL_TYPE:
-                if (this.symbolPools[EMPTY_SYMBOL_TYPE].length > 0) {
-                    symbol = this.symbolPools[EMPTY_SYMBOL_TYPE].shift();
+            case IMAGE_SYMBOL_TYPE:
+                this.symbolPools[type] = this.symbolPools[type] || [];
+                if (this.symbolPools[type].length > 0) {
+                    symbol = this.symbolPools[type].shift();
                 }
                 else {
                     symbol = new Symbol(this.game); // Allocation
                 }
+
+                // This is symbol is an image symbol, then load the texture into it.
+                if (type === IMAGE_SYMBOL_TYPE) {
+                    symbol.loadTexture(this.imageAtlasMap[key], key);
+                }
                 break;
 
             case MOVIE_SYMBOL_TYPE:
-            case IMAGE_SYMBOL_TYPE:
                 this.symbolPools[type][key] = this.symbolPools[type][key] || [];
 
                 // Check and return from the pools.
                 if (this.symbolPools[type][key].length > 0) {
                     symbol = this.symbolPools[type][key].shift();
+                    symbol.setup(this.movieMap[key]);
                 }
-                // No free symbols, create a new one.
+                else if (this.movieMap[key] !== undefined) {
+                    // No free Movie for type 'key', create a new one.
+                    symbol = new Movie(this.game, this.movieMap[key], this.frameRate); // Allocation
+                }
                 else {
-                    if (type === IMAGE_SYMBOL_TYPE) {
-                        if (this.imageAtlasMap[key] === undefined) {
-                            throw new Error(`Cannot find image symbol ${key} in ${this.key}.`);
-                        }
-                        symbol = new Symbol(this.game, 0, 0, this.imageAtlasMap[key], key); // Allocation
-                    }
-                    else {
-                        if (this.movieMap[key] === undefined) {
-                            throw new Error(`Cannot find movie symbol ${key} in ${this.key}.`);
-                        }
-                        symbol = new Movie(this.game, this.movieMap[key], this.frameRate); // Allocation
-                    }
+                    throw new Error(`Cannot find movie symbol ${key} in ${this.key}.`);
                 }
                 break;
 
@@ -258,6 +302,7 @@ export class Library {
      * Store the provided symbol in this library.
      * Only symbols created from this library using the Library::create() function can be store in this library.
      * @param {Symbol | Movie} symbol 
+     * @version 1.0
      */
     storeSymbol(symbol) {
         if (this.isDestroyed) {
@@ -271,16 +316,15 @@ export class Library {
         const type = symbol.symbolType;
         switch (type) {
             case EMPTY_SYMBOL_TYPE:
-                if (this.symbolPools[EMPTY_SYMBOL_TYPE].indexOf(symbol) >= 0) {
+            case IMAGE_SYMBOL_TYPE:
+                if (this.symbolPools[type].indexOf(symbol) >= 0) {
                     throw new Error("Attempting to store a symbol that is already in storage. Symbols in storages should not be referenced.");
                 }
-                this.symbolPools[EMPTY_SYMBOL_TYPE].push(symbol);
+                this.symbolPools[type].push(symbol);
                 break;
 
             case MOVIE_SYMBOL_TYPE:
-            case IMAGE_SYMBOL_TYPE:
                 const key = symbol.symbolKey
-
                 this.symbolPools[type][key] = this.symbolPools[type][key] || [];
                 if (this.symbolPools[type][key].indexOf(symbol) >= 0) {
                     throw new Error("Attempting to store a symbol that is already in storage. Symbols in storages should not be referenced.");
@@ -295,6 +339,8 @@ export class Library {
 
     /**
      * Generates the frame data for the loaded library atlas pngs and updates the cached image data.
+     * @internal
+     * @version 1.0
      */
     generateFrameData() {
         if (this.isDestroyed) {

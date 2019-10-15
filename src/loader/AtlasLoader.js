@@ -4,6 +4,7 @@
  * @param {string} libraryJson 
  * @param {string | Array.<string>} textureUrls 
  * @param {boolean} overwrite 
+ * @version 1.0
  */
 export function atlasLoader(key, libraryJson, textureUrls, overwrite) {
     textureUrls = textureUrls || [];

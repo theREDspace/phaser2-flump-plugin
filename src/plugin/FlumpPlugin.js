@@ -1,7 +1,18 @@
 import { Library } from "../library/Library";
 
 /**
- * FlumpPlugin - TODO: desciption
+ * Phaser 2 plugin used to play Flump animations. This plugin store Flump libraries which can be loaded
+ * using Phaser 2's load manager. Simply call `game.load.flumpAtlas(libraryKey, libraryJson, atlasPNGs)` in the 
+ * preload function of any state. After library assets are loaded, call `game.flump.addLibrary(libraryKey)` to
+ * begin using Flump animations within Phaser 2. Create symbols by calling `game.flump.createSymbol(symbolKey)`
+ * or `game.flump.createSymbolFrom(libraryKey, symbolKey)`. Remove a library from the plugin by calling
+ * `game.flump.removeLibrary(libraryKey)`.
+ * 
+ * Please note that removing a library from the plugin will result in that library being destroyed. 
+ * Once a library is destroyed it should be consider unusable. Any symbols created from a destroyed library 
+ * should also be considered unusable and should be destroyed as well.
+ * 
+ * @version 1.0
  */
 export class FlumpPlugin extends Phaser.Plugin {
     constructor(game, parent) {
@@ -9,11 +20,15 @@ export class FlumpPlugin extends Phaser.Plugin {
 
         /** 
          * @type {Phaser.Game} 
+         * @readonly
+         * @version 1.0
          */
         this.game.flump = this.game.flump || this;
 
         /** 
          * @type {Object.<string, Library>} 
+         * @readonly
+         * @version 1.0
          */
         this.libraries = {};
     }
@@ -22,6 +37,7 @@ export class FlumpPlugin extends Phaser.Plugin {
      * Adds a library to the Flump plugin. 
      * All library dependencies must be loaded to cache before adding a library
      * @param {string} key Library key
+     * @version 1.0
      */
     addLibrary(key) {
         if (this.libraries[key] !== undefined) {
@@ -36,6 +52,7 @@ export class FlumpPlugin extends Phaser.Plugin {
      * the library is removed from the plugin. It is good practice to clean up any references to Movies or Image symbols
      * before removing the library it is from.
      * @param {string} key Library key
+     * @version 1.0
      */
     removeLibrary(key) {
         if (this.libraries[key] !== undefined) {
@@ -45,8 +62,18 @@ export class FlumpPlugin extends Phaser.Plugin {
     }
 
     /**
+     * Check to see if the plugin has a Flump library for the provided key.
+     * @param {string} key 
+     * @version 1.0
+     */
+    hasLibrary(key) {
+        return this.libraries[key] !== undefined;
+    }
+
+    /**
      * Searches all libraries for the first instance of the symbol and returns an instance of it.
      * @param {string} key Symbol key to search for.
+     * @version 1.0
      */
     createSymbol(key) {
         // Search for a library that contains a symbol for the provided key.
@@ -63,6 +90,7 @@ export class FlumpPlugin extends Phaser.Plugin {
      * Passing in 'undefined' for the symbol key will return an empty image symbol from the library.
      * @param {string} library Library key
      * @param {string} key Symbol key
+     * @version 1.0
      */
     createSymbolFrom(library, key) {
         if (this.libraries[library] === undefined) {

@@ -1,35 +1,87 @@
+import { MOVIE_SYMBOL_TYPE, IMAGE_SYMBOL_TYPE } from "../constants/Constants";
+
 /**
- * Symbol - TODO: desciption
+ * Flump symbol. This is the base symbol class for the Flump plugin. It's used to store some symbol specific
+ * information that will allow the plugin to know how to manage this symbol. It's also used to implement
+ * the ability to skew a `Phaser.Image` object. Its used as a generic image symbol and is extended by
+ * `Movie`. 
+ * 
+ * @version 1.0
  */
 export class Symbol extends Phaser.Image {
     constructor(game, x, y, key, frame) {
         super(game, x, y, key, frame);
         /**
          * @type {string}
+         * @version 1.0
          */
         this.symbolType = undefined;
         /**
          * @type {string}
+         * @version 1.0
          */
         this.symbolKey = undefined;
         /**
          * @type {string}
+         * @version 1.0
          */
         this.symbolLibrary = undefined;
         /**
          * @type {Phaser.Point}
+         * @version 1.0
          */
         this.skew = new Phaser.Point(0, 0);
     }
 
-    destroy() {
+    /**
+     * Destroys this symbol object
+     * @param {boolean} destroyChildren 
+     * @version 1.0
+     */
+    destroy(destroyChildren) {
         this.skew = undefined;
-        super.destroy();
+        super.destroy(destroyChildren);
     }
 
+    /**
+     * Phaser 2's alias for `PIXI.DisplayObject.updateTransform`.
+     * @param {PIXI.DisplayObject} parent 
+     * @internal
+     * @version 1.0
+     */
     displayObjectUpdateTransform(parent) {
+        if (this.symbolType === MOVIE_SYMBOL_TYPE) {
+            return this.calculateTransform(parent);
+        }
+        else {
+            return super.displayObjectUpdateTransform(parent);
+        }
+    }
+
+    /**
+     * Phaser 2's overriden version of `PIXI.DisplayObject.updateTransform`.
+     * @param {PIXI.DisplayObject} parent 
+     * @internal
+     * @version 1.0
+     */
+    updateTransform(parent) {
+        if (this.symbolType === IMAGE_SYMBOL_TYPE) {
+            return this.calculateTransform(parent);
+        }
+        else {
+            return super.updateTransform(parent);
+        }
+    }
+
+    /**
+     * Calculates the rendering position, scale, rotation and alpha for this symbol.
+     * @param {PIXI.DisplayObject} parent 
+     * @internal
+     * @version 1.0
+     */
+    calculateTransform(parent) {
         if (!parent && !this.parent && !this.game) {
-            return;
+            return this;
         }
 
         var p = this.parent;
@@ -105,6 +157,8 @@ export class Symbol extends Phaser.Image {
         //  Custom callback?
         if (this.transformCallback) {
             this.transformCallback.call(this.transformCallbackContext, wt, pt);
-        }
+        } 
+
+        return this;
     }
 }

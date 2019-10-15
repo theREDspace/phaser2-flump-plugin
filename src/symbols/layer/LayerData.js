@@ -1,11 +1,15 @@
 import { KeyframeData } from "../keyframe/KeyframeData";
 
 /**
- * LayerData - TODO: desciption
+ * Layer information for a Movie symbol.
+ * 
+ * @version 1.0
  */
 export class LayerData {
     /**
      * @type {number}
+     * @readonly
+     * @version 1.0
      */
     get frameCount() {
         if (this.keyframes.length === 0) {
@@ -19,12 +23,14 @@ export class LayerData {
         /**
          * Library this layer data is from.
          * @type {string}
+         * @version 1.0
          */
         this.library = library;
 
         /**
          * Movie this layer data is from.
          * @type {string}
+         * @version 1.0
          */
         this.movie = movie;
 
@@ -34,11 +40,13 @@ export class LayerData {
         }
         /**
          * @type {string}
+         * @version 1.0
          */
         this.name = json.name;
 
         /**
          * @type {boolean}
+         * @version 1.0
          */
         this.flipbook = json.flipbook || false; 
 
@@ -48,20 +56,23 @@ export class LayerData {
         }
         /**
          * @type {Array.<KeyframeData>}
+         * @version 1.0
          */
         this.keyframes = json.keyframes.map(keyframe => new KeyframeData(keyframe));
     }
 
     /**
      * Clean up this LayerData.
+     * @version 1.0
      */
     destroy() {
         this.keyframes = undefined;
     }
 
     /**
-     * 
+     * Returns the KeyframeData object for the given frame.
      * @param {number} frame 
+     * @version 1.0
      */
     getKeyframeData(frame) {
         let i = 1;
