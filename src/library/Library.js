@@ -18,7 +18,7 @@ import { Symbol } from "../symbols/Symbol";
  * When a library is destroyed, all stored symbols are also destroyed. Any attempt to store symbols after the library has been
  * destroyed will result in an error. Existing Movie symbols may still play after the library is destroyed, however changing 
  * the animation in the Movie will result in the Movie attempting to access the library. It is best practice to only destroy 
- * a library when you know it will not be needed, and destroying any symbols that may still be living outside of the library 
+ * a library when you know it will not be needed, and destroying any symbols that may be living outside of the library 
  * still in use.
  * 
  * @version 1.0
@@ -26,10 +26,15 @@ import { Symbol } from "../symbols/Symbol";
 export class Library {
     /**
      * @type {number}
-         * @readonly
+     * @readonly
      * @version 1.0
      */
-    get frameRate() { return this.data.frameRate || 0; }
+    get frameRate() { 
+        if (this.data.frameRate === undefined) {
+            throw new Error(`${this.key} is missing the 'frameRate' field in its library.json file.`);
+        }
+        return this.data.frameRate; 
+    }
 
     constructor(game, key) {
         /**
@@ -242,17 +247,14 @@ export class Library {
             // Ideally we will never get here, however throw an error in case the user tries to use the library after it was removed from the plugin.
             throw new Error(`${this.key} has been destroyed and has no symbols.`);
         }
-        /**
-         * @type {Symbol | Movie}
-         */
-        let symbol;
-
-        const symbolKey = key || EMPTY_SYMBOL_TYPE;
 
         if (type !== EMPTY_SYMBOL_TYPE && type !== IMAGE_SYMBOL_TYPE && type !== MOVIE_SYMBOL_TYPE) {
             throw new Error(`Cannot get the symbol ${key} in ${this.key}.`);
         }
-        
+
+        const symbolKey = key || EMPTY_SYMBOL_TYPE;
+        let symbol;
+
         this.symbolPools[type] = this.symbolPools[type] || [];
         if (this.symbolPools[type].length > 0) {
             symbol = this.symbolPools[type].shift();
@@ -284,28 +286,29 @@ export class Library {
 
     /**
      * Store the provided symbol in this library.
-     * Only symbols created from this library using the Library::create() function can be store in this library.
+     * Only symbols created from this library using the Library.create() function can be store in this library.
      * @param {Symbol | Movie} symbol 
      * @version 1.0 - Added
      */
     storeSymbol(symbol) {
         if (this.isDestroyed) {
             // Ideally we will never get here, however throw an error in case the user tries to use the library after it was removed from the plugin.
-            throw new Error(`${this.key} has been destroyed and no longer can store symbols. Use Symbol::destroy() instead.`);
-        }
-        if (symbol.symbolLibrary === undefined || symbol.symbolLibrary !== this.key) {
-            throw new Error('The provided symbol does not belong to this library.');
+            throw new Error(`${this.key} has been destroyed and no longer can store symbols. Use Symbol.destroy() instead.`);
         }
 
-        const type = symbol.symbolType;
-        if (type !== EMPTY_SYMBOL_TYPE && type !== IMAGE_SYMBOL_TYPE && type !== MOVIE_SYMBOL_TYPE) {
+        if (symbol.symbolLibrary === undefined || symbol.symbolLibrary !== this.key) {
+            throw new Error("The provided symbol does not belong to this library.");
+        }
+
+        if (symbol.symbolType !== EMPTY_SYMBOL_TYPE && symbol.symbolType !== IMAGE_SYMBOL_TYPE && symbol.symbolType !== MOVIE_SYMBOL_TYPE) {
             throw new Error(`Cannot store the symbol ${symbol.symbolKey} in ${this.key}.`);
         }
         
-        if (this.symbolPools[type].indexOf(symbol) >= 0) {
+        if (this.symbolPools[symbol.symbolType].indexOf(symbol) >= 0) {
             throw new Error("Attempting to store a symbol that is already in storage. Symbols in storages should not be referenced.");
         }
-        this.symbolPools[type].push(symbol);
+
+        this.symbolPools[symbol.symbolType].push(symbol);
     }
 
     /**

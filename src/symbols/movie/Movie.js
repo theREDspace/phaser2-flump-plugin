@@ -354,7 +354,7 @@ export class Movie extends Symbol {
     }
 
     /**
-     * Same as Movie::goTo, however this will also advance nested Movie objects to the specified frame.
+     * Same as Movie.goTo, however this will also advance nested Movie objects to the specified frame.
      * If the frame does no exist on a child Movie, then that Movie is advanced to its last frame.
      * @param {number} frame 
      * @internal
@@ -365,7 +365,7 @@ export class Movie extends Symbol {
     }
 
     /**
-     * GoTo function used internally to the Movie. It's suggested to use Movie::goTo() or Movie::recursiveGoTo() instead.
+     * GoTo function used internally to the Movie. It's suggested to use Movie.goTo() or Movie.recursiveGoTo() instead.
      * @param {string | number} frame 
      * @param {boolean} recursive 
      * @internal
@@ -641,7 +641,7 @@ export class Movie extends Symbol {
         }
 
         if (this.isUpdatingFrame) {
-            throw new Error("Movie::updateFrame() is being called recursively");
+            throw new Error("Movie.updateFrame() is being called recursively");
         }
 
         this.pendingGoToFrame = NO_FRAME;
