@@ -55,6 +55,8 @@ export class Symbol extends Phaser.Image {
         this.scale.set(1, 1);
         this.alpha = 1;
         this.visible = true;
+
+        return this;
     }
 
     /**

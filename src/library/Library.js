@@ -252,24 +252,25 @@ export class Library {
 
         this.symbolPools[type] = this.symbolPools[type] || [];
         if (this.symbolPools[type].length > 0) {
-            symbol = this.symbolPools[type].shift();
+            // Pull a symbol from a pool and restore it for reuse.
+            symbol = this.symbolPools[type].shift().restore();
         }
         else {
+            // No available symbols in the pools, so now we allocate a new symbol.
             if (type === MOVIE_SYMBOL_TYPE) {
-                symbol = new Movie(this.game, this.movieMap[key], this.frameRate); // Allocation
+                symbol = new Movie(this.game, this.frameRate); // Allocation
             }
             else {
                 symbol = new Symbol(this.game); // Allocation
             }
         }
 
-        symbol.restore();
-
-        // This is symbol is an image symbol, then load the texture into it.
         if (type === IMAGE_SYMBOL_TYPE) {
+            // Load the image data into this symbol.
             symbol.loadTexture(this.imageAtlasMap[key], key);
         }
         else if (type === MOVIE_SYMBOL_TYPE) {
+            // Set this movie up with the movie data.
             symbol.setup(this.movieMap[key])
         }
 

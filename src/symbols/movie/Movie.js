@@ -78,7 +78,7 @@ export class Movie extends Symbol {
      */
     get isPlaying() { return this.state === PLAYING; }
 
-    constructor(game, data, frameRate) {
+    constructor(game, frameRate) {
         super(game);
 
         /**
@@ -189,9 +189,6 @@ export class Movie extends Symbol {
          * @version 1.0
          */
         this.playbackLoop = new Phaser.Signal();
-
-        // Setup initial state of the Movie.
-        this.setup(data).addedToLayer();
     }
 
     /**
@@ -734,8 +731,6 @@ export class Movie extends Symbol {
      * @version 1.0
      */
     restore() {
-        super.restore();
-        
         this.parentMovie = undefined;
         this.framePosition = NO_FRAME;
         this.stopFrame = NO_FRAME;
@@ -749,5 +744,7 @@ export class Movie extends Symbol {
         this.labelEvents.removeAll();
         this.playbackComplete.removeAll();
         this.playbackLoop.removeAll();
+
+        return super.restore();
     }
 }
