@@ -268,6 +268,8 @@ export class Library {
             }
         }
 
+        symbol.restore();
+
         // This is symbol is an image symbol, then load the texture into it.
         if (type === IMAGE_SYMBOL_TYPE) {
             symbol.loadTexture(this.imageAtlasMap[key], key);

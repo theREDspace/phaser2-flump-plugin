@@ -727,4 +727,27 @@ export class Movie extends Symbol {
         }
         return new Layer(this);
     }
+
+    /**
+     * Restores the Movie symbol to its default state.
+     * @internal
+     * @version 1.0
+     */
+    restore() {
+        super.restore();
+        
+        this.parentMovie = undefined;
+        this.framePosition = NO_FRAME;
+        this.stopFrame = NO_FRAME;
+        this.pendingGoToFrame = NO_FRAME;
+        this.playTime = 0;
+        this.skipAdvanceTime = false;
+        this.isUpdatingFrame = false;
+        this.fallbackLoop = undefined;
+        this.playbackSpeed = 1;
+        this.state = PLAYING
+        this.labelEvents.removeAll();
+        this.playbackComplete.removeAll();
+        this.playbackLoop.removeAll();
+    }
 }

@@ -44,6 +44,20 @@ export class Symbol extends Phaser.Image {
     }
 
     /**
+     * Restores the Symbol to its default state.
+     * @internal
+     * @version 1.0
+     */
+    restore() {
+        this.position.set(0, 0);
+        this.pivot.set(0, 0);
+        this.skew.set(0, 0);
+        this.scale.set(1, 1);
+        this.alpha = 1;
+        this.visible = true;
+    }
+
+    /**
      * Phaser 2's alias for `PIXI.DisplayObject.updateTransform`.
      * @param {PIXI.DisplayObject} parent 
      * @internal
