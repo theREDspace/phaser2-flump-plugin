@@ -168,11 +168,6 @@ export class Library {
      * @version 1.0
      */
     create(key) {
-        if (this.isDestroyed) {
-            // Ideally we will never get here, however throw an error in case the user tries to use the library after it was removed from the plugin.
-            throw new Error(`${this.key} has been destroyed and cannot be used to make new symbols.`);
-        }
-
         if (key === undefined) {
             return this.getFreeSymbol(EMPTY_SYMBOL_TYPE);
         }
