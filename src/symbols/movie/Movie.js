@@ -140,6 +140,12 @@ export class Movie extends Symbol {
          * @type {number}
          * @version 1.0
          */
+        this.lastFrameIdx = NO_FRAME;
+
+        /**
+         * @type {number}
+         * @version 1.0
+         */
         this.playTime = 0;
 
         /**
@@ -597,7 +603,10 @@ export class Movie extends Symbol {
                 this.playTime %= this.duration;
             }
 
-            let nextFrame = Math.round(this.playTime * this.frameRate);
+            // Originally Math.round(this.playTime * this.frameRate)
+            // Removed rounding for smoother motion. Keeping this note in case
+            // problems pop up down the road.
+            let nextFrame = this.playTime * this.frameRate; 
             if (nextFrame < 0) {
                 nextFrame = 0;
             }
@@ -607,7 +616,10 @@ export class Movie extends Symbol {
 
             if (this.stopFrame !== NO_FRAME) {
                 const framesRemaining = this.framePosition <= this.stopFrame ? this.stopFrame - this.framePosition : this.frameCount - this.framePosition + this.stopFrame;
-                const framesElapsed = Math.round(actualPlayTime * this.frameRate) - this.framePosition;
+                // Originally Math.round(actualPlayTime * this.frameRate)
+                // Removed rounding for smoother motion. Keeping this note in case
+                // problems pop up down the road.
+                const framesElapsed = (actualPlayTime * this.frameRate) - this.framePosition;
                 
                 if (framesElapsed >= framesRemaining) {
                     this.state = STOPPED;
@@ -662,25 +674,30 @@ export class Movie extends Symbol {
             }
         }
 
-        let frameIndex = startFrame;
-        for (let i = 0; i < count; ++i) {
-            if (this.pendingGoToFrame !== NO_FRAME) {
-                break;
-            }
+        const num = startFrame | 0;
+        if (this.lastFrameIdx !== num) {
+            this.lastFrameIdx = num;
 
-            // Fire frame label events.
-            if (this.labels[frameIndex] !== undefined) {
-                for (let j = 0; j < this.labels[frameIndex].length; j++) {
-                    this.labelEvents.dispatch(this.labels[frameIndex][j]);
-                    if (this.pendingGoToFrame !== NO_FRAME) {
-                        break;
+            let frameIndex = this.lastFrameIdx;
+            for (let i = 0; i < count; ++i) {
+                if (this.pendingGoToFrame !== NO_FRAME) {
+                    break;
+                }
+    
+                // Fire frame label events.
+                if (this.labels[frameIndex] !== undefined) {
+                    for (let j = 0; j < this.labels[frameIndex].length; j++) {
+                        this.labelEvents.dispatch(this.labels[frameIndex][j]);
+                        if (this.pendingGoToFrame !== NO_FRAME) {
+                            break;
+                        }
                     }
                 }
-            }
-
-            // Avoid modulo division.
-            if (++frameIndex === this.frameCount) {
-                frameIndex = 0;
+    
+                // Avoid modulo division.
+                if (++frameIndex === this.frameCount) {
+                    frameIndex = 0;
+                }
             }
         }
 
@@ -699,14 +716,13 @@ export class Movie extends Symbol {
         }
 
         if (!this.isManagedByParent) {
-            if (nextFrame === this.stopFrame) {
-                this.playbackComplete.dispatch();
-
+            if (this.framePosition === this.stopFrame) {
                 if (this.fallbackLoop !== undefined) {
                     this.loop(this.fallbackLoop);
                 }
+                this.playbackComplete.dispatch();
             }
-            else if (nextFrame < lastFrame) {
+            else if (this.framePosition < lastFrame) {
                 this.playbackLoop.dispatch();
             }
         }
@@ -735,6 +751,7 @@ export class Movie extends Symbol {
         this.framePosition = NO_FRAME;
         this.stopFrame = NO_FRAME;
         this.pendingGoToFrame = NO_FRAME;
+        this.lastFrameIdx = NO_FRAME;
         this.playTime = 0;
         this.skipAdvanceTime = false;
         this.isUpdatingFrame = false;

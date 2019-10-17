@@ -99,7 +99,7 @@ export class Layer {
          * @type {number}
          * @version 1.0
          */
-        this.position = 0;
+        this.keyframeIdx = 0;
     }
 
     /**
@@ -214,19 +214,19 @@ export class Layer {
         }
         else if (frame >= this.frameCount) {
             this.currentSymbol.visible = false;
-            this.position = this.keyframes.length - 1;
+            this.keyframeIdx = this.keyframes.length - 1;
             return this;
         }
 
-        if (this.keyframes[this.position].index > frame) {
-            this.position = 0;
+        if (this.keyframes[this.keyframeIdx].index > frame) {
+            this.keyframeIdx = 0;
         }
 
-        while (this.position < this.keyframes.length - 1 && this.keyframes[this.position + 1].index <= frame) {
-            this.position++;
+        while (this.keyframeIdx < this.keyframes.length - 1 && this.keyframes[this.keyframeIdx + 1].index <= frame) {
+            this.keyframeIdx++;
         }
 
-        const symbol = this.symbols[this.position];
+        const symbol = this.symbols[this.keyframeIdx];
         if (this.currentSymbol !== symbol) {;
             this.currentSymbol.visible = false;
 
@@ -237,7 +237,7 @@ export class Layer {
             this.currentSymbol = symbol;
         }
 
-        const keyframe = this.keyframes[this.position];
+        const keyframe = this.keyframes[this.keyframeIdx];
         let x = keyframe.x;
         let y = keyframe.y;
         let pivotX = keyframe.pivotX;
@@ -247,8 +247,10 @@ export class Layer {
         let skewX = keyframe.skewX;
         let skewY = keyframe.skewY;
         let alpha = keyframe.alpha;
+        
+        this.currentSymbol.visible = keyframe.visible;
 
-        if (this.position + 1 < this.keyframes.length && keyframe.index !== frame && keyframe.tweened) {
+        if (this.keyframeIdx < this.keyframes.length - 1 && keyframe.index !== frame && keyframe.tweened) {
             let step = (frame - keyframe.index) / keyframe.duration;
             let ease = keyframe.ease;
 
@@ -267,20 +269,19 @@ export class Layer {
                 step = ease * time + (1 - ease) * step;
             }
 
-            const nextKeyframe = this.keyframes[this.position + 1];
-            x += (nextKeyframe.x - keyframe.x) * step;
-            y += (nextKeyframe.y - keyframe.y) * step;
-            pivotX += (nextKeyframe.pivotX - keyframe.pivotX) * step;
-            pivotY += (nextKeyframe.pivotY - keyframe.pivotY) * step;
-            scaleX += (nextKeyframe.scaleX - keyframe.scaleX) * step;
-            scaleY += (nextKeyframe.scaleY - keyframe.scaleY) * step;
-            skewX += (nextKeyframe.skewX - keyframe.skewX) * step;
-            skewY += (nextKeyframe.skewY - keyframe.skewY) * step;
-            alpha += (nextKeyframe.alpha - keyframe.alpha) * step;
+            const next = this.keyframes[this.keyframeIdx + 1];
+            x += (next.x - x) * step;
+            y += (next.y - y) * step;
+            pivotX += (next.pivotX - pivotX) * step;
+            pivotY += (next.pivotY - pivotY) * step;
+            scaleX += (next.scaleX - scaleX) * step;
+            scaleY += (next.scaleY - scaleY) * step;
+            skewX += (next.skewX - skewX) * step;
+            skewY += (next.skewY - skewY) * step;
+            alpha += (next.alpha - alpha) * step;
         }
 
         this.updateSymbol(x, y, pivotX, pivotY, scaleX, scaleY, skewX, skewY, alpha);
-        this.currentSymbol.visible = keyframe.visible;
         
         return this;
     }
@@ -300,11 +301,13 @@ export class Layer {
      * @version 1.0
      */
     updateSymbol(x, y, pivotX, pivotY, scaleX, scaleY, skewX, skewY, alpha) {
-        this.currentSymbol.position.set(x, y);
-        this.currentSymbol.pivot.set(pivotX, pivotY);
-        this.currentSymbol.skew.set(skewX, skewY);
-        this.currentSymbol.scale.set(scaleX, scaleY);
-        this.currentSymbol.alpha = alpha;
+        if (this.currentSymbol.visible) {
+            this.currentSymbol.position.set(x, y);
+            this.currentSymbol.pivot.set(pivotX, pivotY);
+            this.currentSymbol.skew.set(skewX, skewY);
+            this.currentSymbol.scale.set(scaleX, scaleY);
+            this.currentSymbol.alpha = alpha;
+        }
     }
 
     /**
@@ -333,7 +336,7 @@ export class Layer {
             this.game.flump.libraries[this.library].storeSymbol(symbol);
         }
 
-        this.position = 0;
+        this.keyframeIdx = 0;
         this.disabled = false;
         this.data = undefined;
         this.currentSymbol = undefined;
