@@ -8,6 +8,9 @@
  */
 export function atlasLoader(key, libraryJson, textureUrls, overwrite) {
     textureUrls = textureUrls || [];
+    if (!Array.isArray(textureUrls)) {
+        textureUrls = [textureUrls];
+    }
     textureUrls.forEach(url => {
         const extension = url.substring(url.lastIndexOf("."));
         const file = url.substring(url.lastIndexOf("/") + 1);
