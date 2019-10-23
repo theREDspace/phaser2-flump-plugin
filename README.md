@@ -1,12 +1,12 @@
 # Phaser 2 - Flump Plugin
 A plugin for Phaser 2 that loads and plays [Flump][1] animations. 
 
-Flump is a tool that exports vector timeline animations from Adobe Animate to rasterized sprite atlases and JSON data. This plaugin will allow developers to load Flump sprite atlases into Phaser's asset cache, and will parse Flump's library JSON to allow Phaser to play Flash-like animations.
+Flump is a tool that exports vector timeline animations from Adobe Animate to rasterized sprite atlases and JSON data. This plugin will allow developers to load Flump sprite atlases into Phaser's asset cache, and will parse Flump's library JSON to allow Phaser to play Flash-like animations.
 
 This plugin is ported from the Flump exporter which was written in Actionscript 3 for Starling. It provides some improvements and additional features from its Actionscript counter part. Basing the plugin off the exporter allows it to provide the most accurate representation of how your animations look when viewed from the exporter.
 
 ## Improvements
-- Smooter motion when interpolating between keyframes
+- Smoother motion when interpolating between keyframes
 - Playback complete and playback loop specific events
 - A couple bug fixes
 
@@ -32,7 +32,7 @@ Or include the built plugin bundle found in the dist folder of this repository. 
 
 # Usage
 ## Adding the plugin to Phaser 2's plugin manager
-The first step is intalling the plugin within your Phaser 2 game. This should be one of the first things your game does once it boots up. Simple import the plugin and added to `Phaser.Game.plugins`.
+The first step is installing the plugin within your Phaser 2 game. This should be one of the first things your game does once it boots up. Simple import the plugin and added to `Phaser.Game.plugins`.
 
 ```javascript
 import { FlumpPlugin } from 'phaser2-flumpplugin'; // TODO - Make this work
@@ -47,7 +47,7 @@ const game = new Phaser.Game(800, 600, Phaser.AUTO, undefined, {
 Here you simply call `game.plugins.add(new FlumpPlugin(game))` within your game's initial state. This will add the plugin to the game allowing us to use it later on in your game. Before using anything in this plugin, it must be added to the game's plugins.
 
 ## Loading Flump assets through Phaser.Loader
-Once the plugin has been added to you game you can now begin to load your Flump assets. This can be done by using Phaser'2 load manager similar to how you would load any other asset type. The plugin provides a special Flump loader function that will handle loading each asset you provide it.
+Once the plugin has been added to your game you can now load your Flump assets. This can be done by using Phaser'2 load manager similar to how you would load any other asset type. The plugin provides a special Flump loader function that will handle loading each asset you provide it.
 
 ```javascript
 import { FlumpPlugin } from 'phaser2-flumpplugin'; // TODO - Make this work
@@ -63,13 +63,13 @@ const game = new Phaser.Game(800, 600, Phaser.AUTO, undefined, {
 });
 ```
 
-Like loading other assets within Phaser, we call `game.load.flumpAtlas(...)` and pass it three arguments.
+Similar to loading other assets within Phaser, we call `game.load.flumpAtlas(...)` and pass it three arguments.
 
-The first is the library key, and will be considered the name for that library. This key is how you access your library data from Phaser's cache object. It is also used to make sure that all atlas PNGs have a unique name within the cache. Because the Flump exporter does not name the atlas images uniquelly per library, the plugin will prepend the library key to the image's file name. In this case, your atlas image is stored as `demoLibrary/atlas0.png`. Knowing this you can easily access individual frames from the Flump atlas by using `game.add.image(0, 0, "demoLibrary/atlas0.png", "greenSquareSprite")`.
+The first is the library key, and will be considered the name for that library. This key is how you access your library data from Phaser's cache object. It is also used to make sure that all atlas PNGs have a unique name within the cache. Because the Flump exporter does not name the atlas images uniquely per library, the plugin will add the library key as a prefix to the image's filename. In this case, your atlas image is stored as `demoLibrary/atlas0.png`. Knowing this you can easily access individual frames from the Flump atlas by using `game.add.image(0, 0, "demoLibrary/atlas0.png", "greenSquareSprite")`.
 
 The second argument is the URL to the `library.json` file. This file is the data file the Flump exporter will create that stores all the animation data within this library. It is stored within Phaser's cache using the library key provided for the first argument.
 
-The third argument is the URL to the atlas image. Because the Flump export does not provide a way to change the naming scheme for exported atlas images, these images will be named `atlas0.png, atlas1.png, atlas2.png`... and so on. It's because of this that the library key is prepended to be beginning of the file name when stored within Phaser 2's cache.
+The third argument is the URL to the atlas image. Because the Flump export does not provide a way to change the naming scheme for exported atlas images, these images will be named `atlas0.png, atlas1.png, atlas2.png`... and so on. It's because of this that the library key is prefixed to be beginning of the filename when stored within Phaser 2's cache.
 
 Optionally when loading a Flump atlas with multiple images, it is possible to provide `game.load.flumpAtlas(...)` with an array of atlas PNGs.
 
@@ -113,7 +113,7 @@ You can remove a library by calling `game.flump.removeLibrary(...)` and providin
 
 Removing a library from the plugin allows it to be cleaned up and garbage collected. Any symbols being stored in the library will be destroyed. After a library is removed, any symbols that have not yet been stored that were created with that library should be considered unusable. These symbol should be manually destroyed, if not already within your scene's hierarchy and the library is being removed in your state's `shutdown()` function.
 
-You should only consider removing a library once you are sure you are finished using it. Optionally, when removing a library you can tell the plugin to unload all of the atlas assets. Doing so will remove the `library.json` and atlas images from Phaser 2's cache and destroys the PIXI.BaseTexture objects. Any references to these assets will cause them to presist in memory.
+You should only consider removing a library once you are sure you are finished using it. Optionally, when removing a library you can tell the plugin to unload all of the atlas assets. Doing so will remove the `library.json` and atlas images from Phaser 2's cache and destroys the PIXI.BaseTexture objects. Any references to these assets will cause them to persist in memory.
 
 Optional unloading example:
 ```javascript
@@ -179,7 +179,7 @@ If the movie to passed `playOnce()` is the name as the current animation playing
 movie.playOnce("orangeSquareRotate", false);
 ```
 
-Finally, you can provide the `playOnce()` function a animation to fall back and loop after the first animation is complete. This is helpfull if you need a character to return to an idle animation after playing a jump.
+Finally, you can provide the `playOnce()` function a animation to fall back and loop after the first animation is complete. This is helpful if you need a character to return to an idle animation after playing a jump.
 
 ```javascript
 // Play the new animation, leaving the restart flag as default, then once the new
