@@ -28,7 +28,7 @@ Install via NPM:
 
 `npm install phaser2-flump-plugin` <- TODO - Make that work
 
-Or include the built plugin bundle found in the dist folder of this repository. <- TODO - Make that a thing
+Or include the built plugin bundle found in the dist folder of this repository. We provide both a minimized and non minimized build of the plugin, along with source maps for debugging.
 
 # Usage
 ## Adding the plugin to Phaser 2's plugin manager
@@ -283,6 +283,31 @@ const movie = game.flump.createSymbol("orangeSquareScale").stopAt("someLabel");
 
 **NOTE**: `stopAt(...)` also works with frame numbers if you know the frame you want to go to. Just provide the frame number instead of a label.
 
+# Building
+If you need to add to or make changes to this plugin, you can build distribution and debug bundles. Follow these steps to create builds of the plugin.
+
+To build the plugin you will require NPM. Head over and download [Node JS][4] to get started. After you have Node JS installed, open a command line tool and navigate to the this project directory. Once there run the following command:
+
+```
+npm install
+```
+
+Whenever that is complete you can use the following commands to build the plugin. After the build is complete, the bundled plugin code can be found in the `dist` folder.
+
+## Debug
+```
+npm run build:debug
+```
+
+This command will build a debug version of the plugin. It will provide an unminimized version of the code along with source maps that can be used for debugging.
+
+## Production
+```
+npm run build:dist
+```
+
+This command will build a minimized version of the plugin that can be included with your game files.
+
 # Resources
 We provide a [demo][3] project that provides examples of how to setup your project to use Flump animations. It also includes very basic implementation of each feature mentioned above.
 
@@ -292,3 +317,4 @@ We provide a [demo][3] project that provides examples of how to setup your proje
 [1]: http://tconkling.github.io/flump/
 [2]: https://github.com/photonstorm/phaser-ce
 [3]: https://github.com/phaser2-flumpdemo
+[4]: https://nodejs.org/en/
