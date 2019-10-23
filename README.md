@@ -13,6 +13,7 @@ This plugin is ported from the Flump exporter which was written in Actionscript 
 ## Additional features
 - Symbol pooling
 - Ability to reuse movie symbols to play different animations
+- Ability to adjust the playback speed of an animation
 
 # Dependencies
 ## Phaser
