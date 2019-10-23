@@ -316,5 +316,5 @@ We provide a [demo][3] project that provides examples of how to setup your proje
 
 [1]: http://tconkling.github.io/flump/
 [2]: https://github.com/photonstorm/phaser-ce
-[3]: https://github.com/phaser2-flumpdemo
+[3]: https://github.com/theREDspace/phaser2-flump-plugin-demo
 [4]: https://nodejs.org/en/
