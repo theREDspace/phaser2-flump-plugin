@@ -2,13 +2,13 @@
     "name": "phaser2-flump-plugin",
     "version": "1.0.0",
     "description": "",
-    "main": "./src/index.js",
+    "main": "./dist/phaser2-flump-plugin.min.js",
     "scripts": {
         "build:debug": "webpack --env.debug",
         "build:dist": "webpack --env.dist"
     },
-    "author": "REDspace",
-    "license": "MIT",
+    "author": "theREDspace",
+    "license": "GPL-3.0",
     "devDependencies": {
         "@babel/core": "^7.6.4",
         "@babel/plugin-proposal-object-rest-spread": "^7.6.2",

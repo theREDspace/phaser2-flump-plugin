@@ -7,7 +7,7 @@ A plugin for Phaser 2 that loads and plays [Flump][1] animations.
 
 Flump is a tool that exports vector timeline animations from Adobe Animate to rasterized sprite atlases and JSON data. This plugin will allow developers to load Flump sprite atlases into Phaser's asset cache, and will parse Flump's library JSON to allow Phaser to play Flash-like animations.
 
-This plugin is ported from the Flump exporter which was written in Actionscript 3 for Starling. It provides some improvements and additional features from its Actionscript counter part. Basing the plugin off the exporter allows it to provide the most accurate representation of how your animations look when viewed from the exporter.
+This plugin is ported from the [Flump exporter][5] which was written in Actionscript 3 for Starling. It provides some improvements and additional features from its Actionscript counter part. Basing the plugin off the exporter allows it to provide the most accurate representation of how your animations look when viewed from the exporter.
 
 ## Improvements
 - Smoother motion when interpolating between keyframes
@@ -31,7 +31,7 @@ The Flump exporter tool provides three different format types for exporting Flum
 # Install
 Install via NPM:
 
-`npm install phaser2-flump-plugin` <- TODO - Make that work
+`npm install phaser2-flump-plugin`
 
 Or include the built plugin bundle found in the dist folder of this repository. We provide both a minimized and non minimized build of the plugin, along with source maps for debugging.
 
@@ -40,7 +40,7 @@ Or include the built plugin bundle found in the dist folder of this repository. 
 The first step is installing the plugin within your Phaser 2 game. This should be one of the first things your game does once it boots up. Simple import the plugin and added to `Phaser.Game.plugins`.
 
 ```javascript
-import { FlumpPlugin } from 'phaser2-flump-plugin'; // TODO - Make this work
+import { FlumpPlugin } from 'phaser2-flump-plugin';
 
 const game = new Phaser.Game(800, 600, Phaser.AUTO, undefined, {
     init() {
@@ -55,7 +55,7 @@ Here you simply call `game.plugins.add(new FlumpPlugin(game))` within your game'
 Once the plugin has been added to your game you can now load your Flump assets. This can be done by using Phaser'2 load manager similar to how you would load any other asset type. The plugin provides a special Flump loader function that will handle loading each asset you provide it.
 
 ```javascript
-import { FlumpPlugin } from 'phaser2-flump-plugin'; // TODO - Make this work
+import { FlumpPlugin } from 'phaser2-flump-plugin';
 
 const game = new Phaser.Game(800, 600, Phaser.AUTO, undefined, {
     init() {
@@ -94,7 +94,7 @@ preload() {
 After you have loaded a Flump atlas, you can now add a library to the plugin. Adding a library allows the plugin to parse the `library.json` data and sets up a manager that will allow you to begin creating Flump animations within your game. You add a library by calling `game.flump.addLibrary(...)` and providing the key you used when loading the Flump atlas.
 
 ```javascript
-import { FlumpPlugin } from 'phaser2-flump-plugin'; // TODO - Make this work
+import { FlumpPlugin } from 'phaser2-flump-plugin';
 
 const game = new Phaser.Game(800, 600, Phaser.AUTO, undefined, {
     init() {
@@ -133,7 +133,7 @@ Once a library has been added to the plugin it is ready to use. There are two di
 Using `createSymbol(...)` allows you to easily create any symbol that is defined in your library. You provide the name of the symbol you wish to create, and it is returned. The plugin will search each library that has been added and return the first instance of the symbol that matches the name you provided. This function will return either an image symbol or a movie symbol.
 
 ```javascript
-import { FlumpPlugin } from 'phaser2-flump-plugin'; // TODO - Make this work
+import { FlumpPlugin } from 'phaser2-flump-plugin';
 
 const game = new Phaser.Game(800, 600, Phaser.AUTO, undefined, {
     init() {
@@ -323,3 +323,4 @@ We provide a [demo][3] project that provides examples of how to setup your proje
 [2]: https://github.com/photonstorm/phaser-ce
 [3]: https://github.com/theREDspace/phaser2-flump-plugin-demo
 [4]: https://nodejs.org/en/
+[5]: https://github.com/tconkling/flump
