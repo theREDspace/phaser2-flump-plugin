@@ -5,8 +5,8 @@ module.exports = env => {
         stats: 'errors-only',
         entry: path.join(__dirname, "./src/index.js"),
         output: {
-            path: path.join(__dirname, "dist"),
-            filename: env.dist ? "phaser2-flump-plugin.min.js" : "phaser2-flump-plugin.js"
+            path: path.join(__dirname, "build"),
+            filename: env.prod ? "phaser2-flump-plugin.min.js" : "phaser2-flump-plugin.js"
         },
         module: {
             rules: [
@@ -22,9 +22,9 @@ module.exports = env => {
                 }
             ]
         },
-        mode: env.dist ? "production" : "development",
+        mode: env.prod ? "production" : "development",
         optimization: {
-            minimize: env.dist
+            minimize: env.prod
         },
         performance: { hints: false },
         devtool: env.debug ? 'source-map' : undefined

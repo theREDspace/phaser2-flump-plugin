@@ -297,7 +297,7 @@ To build the plugin you will require NPM. Head over and download [Node JS][4] to
 npm install
 ```
 
-Whenever that is complete you can use the following commands to build the plugin. After the build is complete, the bundled plugin code can be found in the `dist` folder.
+Whenever that is complete you can use the following commands to build the plugin. After the build is complete, the bundled plugin code can be found in the `build` folder.
 
 ## Debug
 ```
@@ -308,19 +308,31 @@ This command will build a debug version of the plugin. It will provide an unmini
 
 ## Production
 ```
-npm run build:dist
+npm run build:prod
 ```
 
 This command will build a minimized version of the plugin that can be included with your game files.
 
 # Resources
-We provide a [demo][3] project that provides examples of how to setup your project to use Flump animations. It also includes very basic implementation of each feature mentioned above.
+We provide a [demo project][3] that provides examples of how to setup your project to use Flump animations. It also includes very basic implementation of each feature mentioned above.
 
 # Versions
 1.0 - Added
+
+# License
+Phaser 2 Flump Plugin is release under the [GLP-3.0 license][7].
+
+# Created by
+Phaser 2 Flump Plugin was created by [REDspace][6].
+
+<img src="./static/REDspace_logo_web.jpg" width="225" height="225"/>
+
+[Flump][1] was created by Tim Conkling, Charlie Groves, and Bruno Garcia.
 
 [1]: http://tconkling.github.io/flump/
 [2]: https://github.com/photonstorm/phaser-ce
 [3]: https://github.com/theREDspace/phaser2-flump-plugin-demo
 [4]: https://nodejs.org/en/
 [5]: https://github.com/tconkling/flump
+[6]: https://www.redspace.com/
+[7]: https://www.gnu.org/licenses/gpl-3.0.en.html

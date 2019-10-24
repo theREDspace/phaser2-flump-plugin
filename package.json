@@ -5,7 +5,7 @@
     "main": "./dist/phaser2-flump-plugin.min.js",
     "scripts": {
         "build:debug": "webpack --env.debug",
-        "build:dist": "webpack --env.dist"
+        "build:prod": "webpack --env.prod"
     },
     "author": "theREDspace",
     "license": "GPL-3.0",
