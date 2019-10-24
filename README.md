@@ -1,4 +1,8 @@
 # Phaser 2 - Flump Plugin
+<div style="text-align:center">
+    <img src="./static/flumpMascot.gif" width="224" height="216"/>
+</div>
+
 A plugin for Phaser 2 that loads and plays [Flump][1] animations. 
 
 Flump is a tool that exports vector timeline animations from Adobe Animate to rasterized sprite atlases and JSON data. This plugin will allow developers to load Flump sprite atlases into Phaser's asset cache, and will parse Flump's library JSON to allow Phaser to play Flash-like animations.
