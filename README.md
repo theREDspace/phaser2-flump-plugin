@@ -70,7 +70,7 @@ const game = new Phaser.Game(800, 600, Phaser.AUTO, undefined, {
 
 Similar to loading other assets within Phaser, we call `game.load.flumpAtlas(...)` and pass it three arguments.
 
-The first is the library key, and will be considered the name for that library. This key is how you access your library data from Phaser's cache object. It is also used to make sure that all atlas PNGs have a unique name within the cache. Because the Flump exporter does not name the atlas images uniquely per library, the plugin will add the library key as a prefix to the image's filename. In this case, your atlas image is stored as `demoLibrary/atlas0.png`. Knowing this you can easily access individual frames from the Flump atlas by using `game.add.image(0, 0, "demoLibrary/atlas0.png", "greenSquareSprite")`.
+The first is the library key, and will be considered the name for that library. This key is how you access your library data from Phaser's cache object. It is also used to make sure that all atlas PNGs have an unique name within the cache. Because the Flump exporter does not name the atlas images uniquely per library, the plugin will add the library key as a prefix to the image's filename. In this case, your atlas image is stored as `demoLibrary/atlas0.png`. Knowing this you can easily access individual frames from the Flump atlas by using `game.add.image(0, 0, "demoLibrary/atlas0.png", "greenSquareSprite")`.
 
 The second argument is the URL to the `library.json` file. This file is the data file the Flump exporter will create that stores all the animation data within this library. It is stored within Phaser's cache using the library key provided for the first argument.
 
@@ -177,14 +177,14 @@ Alternatively you can use `playOnce()` to assign the movie a new animations.
 movie.playOnce("orangeSquareRotate");
 ```
 
-If the movie to passed `playOnce()` is the name as the current animation playing, then you can specify if you want the animation to restart or not. By default, animations will restart.
+If the movie passed to `playOnce()` is the name as the current animation playing, then you can specify if you want the animation to restart or not. By default, animations will restart.
 
 ```javascript
 // Do not restart if orangeSquareRotate is already playing
 movie.playOnce("orangeSquareRotate", false);
 ```
 
-Finally, you can provide the `playOnce()` function a animation to fall back and loop after the first animation is complete. This is helpful if you need a character to return to an idle animation after playing a jump.
+Finally, you can provide `playOnce()` with an animation to fall back and loop after the first animation is complete. This is helpful if you need a character to return to an idle animation after playing a jump.
 
 ```javascript
 // Play the new animation, leaving the restart flag as default, then once the new
@@ -216,7 +216,7 @@ movie.loop();
 
 ```javascript
 // Loop the current animation without restarting it.
-movie.loop(null, true);
+movie.loop(null, false);
 ```
 
 ```javascript
@@ -225,7 +225,7 @@ movie.loop("orangeSquareRotate");
 ```
 
 ### On playback loop
-Sometimes it's helpful to trigger game logic every time a loop of an animation completes. For this you can use a movie's `playbackLoop` signal.
+Sometimes it's helpful to trigger game logic every time a loop of an animation completes. For this you can use a movie's `playbackLoop` signal. It is important to note that `playbackComplete` does not fire if an animation is looping. So use `playbackLoop` to know with a cycle of a `loop()` completes, and `playbackComplete` when a `playOnce()` completes.
 
 ```javascript
 const movie = game.flump.createSymbol("orangeSquareScale");
@@ -275,7 +275,7 @@ const movie = game.flump.createSymbol("orangeSquareScale").goTo("someLabel").sto
 
 **NOTE**: `goto(...)` also works with frame numbers if you know the frame you want to go to. Just provide the frame number instead of a label.
 
-Or you can use `stopAt(...)` a specific label.
+You can also tell a movie to `stopAt(...)` a specific label. This will cause the movie to continue playing until the next time it reaches the specified label.
 
 ```javascript
 const movie = game.flump.createSymbol("orangeSquareScale");
@@ -291,7 +291,7 @@ const movie = game.flump.createSymbol("orangeSquareScale").stopAt("someLabel");
 # Building
 If you need to add to or make changes to this plugin, you can build distribution and debug bundles. Follow these steps to create builds of the plugin.
 
-To build the plugin you will require NPM. Head over and download [Node JS][4] to get started. After you have Node JS installed, open a command line tool and navigate to the this project directory. Once there run the following command:
+To build the plugin you will require NPM. Head over and download [Node JS][4] to get started. After you have Node JS installed, open a command line tool and navigate to this project directory. Once there run the following command:
 
 ```
 npm install
