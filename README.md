@@ -320,12 +320,14 @@ We provide a [demo project][3] that provides examples of how to setup your proje
 1.0 - Added
 
 # License
-Phaser 2 Flump Plugin is release under the [GLP-3.0 license][7].
+Phaser 2 Flump Plugin is release under the [GPL-3.0 license][7].
 
 # Created by
 Phaser 2 Flump Plugin was created by [REDspace][6].
 
 <img src="./static/REDspace_logo_web.jpg" width="225" height="225"/>
+
+REDSpace and their respective logos are trademarks of REDSpace Inc. ©2019
 
 [Flump][1] was created by Tim Conkling, Charlie Groves, and Bruno Garcia.
 
