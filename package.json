@@ -8,7 +8,7 @@
         "build:prod": "webpack --env.prod"
     },
     "author": "theREDspace",
-    "license": "GPL-3.0",
+    "license": "LGPL-3.0",
     "devDependencies": {
         "@babel/core": "^7.6.4",
         "@babel/plugin-proposal-object-rest-spread": "^7.6.2",
