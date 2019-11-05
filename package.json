@@ -1,21 +1,34 @@
 {
-    "name": "phaser2-flump-plugin",
-    "version": "1.0.0",
-    "description": "",
-    "main": "./dist/phaser2-flump-plugin.min.js",
-    "scripts": {
-        "build:debug": "webpack --env.debug",
-        "build:prod": "webpack --env.prod"
-    },
-    "author": "theREDspace",
-    "license": "LGPL-3.0",
-    "devDependencies": {
-        "@babel/core": "^7.6.4",
-        "@babel/plugin-proposal-object-rest-spread": "^7.6.2",
-        "@babel/preset-env": "^7.6.3",
-        "babel-loader": "^8.0.6",
-        "webpack": "^4.41.2",
-        "webpack-cli": "^3.3.9"
-    },
-    "dependencies": {}
+  "name": "@redspace/phaser2-flump-plugin",
+  "version": "1.0.0",
+  "description": "",
+  "main": "./dist/phaser2-flump-plugin.min.js",
+  "dependencies": {},
+  "devDependencies": {
+    "@babel/core": "^7.6.4",
+    "@babel/plugin-proposal-object-rest-spread": "^7.6.2",
+    "@babel/preset-env": "^7.6.3",
+    "babel-loader": "^8.0.6",
+    "webpack-cli": "^3.3.9",
+    "webpack": "^4.41.2"
+  },
+  "scripts": {
+    "build:debug": "webpack --env.debug",
+    "build:prod": "webpack --env.prod"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/theREDspace/phaser2-flump-plugin.git"
+  },
+  "keywords": [
+    "phaser2",
+    "flump",
+    "plugin"
+  ],
+  "author": "theREDspace",
+  "license": "LGPL-3.0",
+  "bugs": {
+    "url": "https://github.com/theREDspace/phaser2-flump-plugin/issues"
+  },
+  "homepage": "https://github.com/theREDspace/phaser2-flump-plugin#readme"
 }
