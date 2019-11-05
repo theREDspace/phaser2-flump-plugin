@@ -1,17 +1,21 @@
 {
-  "name": "phaser2-flumpplugin",
-  "version": "1.0.0",
-  "description": "",
-  "main": "src/index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "author": "REDspace",
-  "license": "ISC",
-  "dependencies": {
-    "phaser-ce": "^2.13.3"
-  },
-  "files": [
-    "src/**/*"
-  ]
+    "name": "phaser2-flump-plugin",
+    "version": "1.0.0",
+    "description": "",
+    "main": "./dist/phaser2-flump-plugin.min.js",
+    "scripts": {
+        "build:debug": "webpack --env.debug",
+        "build:prod": "webpack --env.prod"
+    },
+    "author": "theREDspace",
+    "license": "LGPL-3.0",
+    "devDependencies": {
+        "@babel/core": "^7.6.4",
+        "@babel/plugin-proposal-object-rest-spread": "^7.6.2",
+        "@babel/preset-env": "^7.6.3",
+        "babel-loader": "^8.0.6",
+        "webpack": "^4.41.2",
+        "webpack-cli": "^3.3.9"
+    },
+    "dependencies": {}
 }
