@@ -31,7 +31,7 @@ The Flump exporter tool provides three different format types for exporting Flum
 # Install
 Install via NPM:
 
-`npm install phaser2-flump-plugin`
+`npm install @redspace/phaser2-flump-plugin`
 
 Or include the built plugin bundle found in the dist folder of this repository. We provide both a minimized and non minimized build of the plugin, along with source maps for debugging.
 
@@ -40,7 +40,7 @@ Or include the built plugin bundle found in the dist folder of this repository. 
 The first step is installing the plugin within your Phaser 2 game. This should be one of the first things your game does once it boots up. Simple import the plugin and added to `Phaser.Game.plugins`.
 
 ```javascript
-import { FlumpPlugin } from 'phaser2-flump-plugin';
+import { FlumpPlugin } from '@redspace/phaser2-flump-plugin';
 
 const game = new Phaser.Game(800, 600, Phaser.AUTO, undefined, {
     init() {
@@ -55,7 +55,7 @@ Here you simply call `game.plugins.add(new FlumpPlugin(game))` within your game'
 Once the plugin has been added to your game you can now load your Flump assets. This can be done by using Phaser'2 load manager similar to how you would load any other asset type. The plugin provides a special Flump loader function that will handle loading each asset you provide it.
 
 ```javascript
-import { FlumpPlugin } from 'phaser2-flump-plugin';
+import { FlumpPlugin } from '@redspace/phaser2-flump-plugin';
 
 const game = new Phaser.Game(800, 600, Phaser.AUTO, undefined, {
     init() {
@@ -94,7 +94,7 @@ preload() {
 After you have loaded a Flump atlas, you can now add a library to the plugin. Adding a library allows the plugin to parse the `library.json` data and sets up a manager that will allow you to begin creating Flump animations within your game. You add a library by calling `game.flump.addLibrary(...)` and providing the key you used when loading the Flump atlas.
 
 ```javascript
-import { FlumpPlugin } from 'phaser2-flump-plugin';
+import { FlumpPlugin } from '@redspace/phaser2-flump-plugin';
 
 const game = new Phaser.Game(800, 600, Phaser.AUTO, undefined, {
     init() {
@@ -133,7 +133,7 @@ Once a library has been added to the plugin it is ready to use. There are two di
 Using `createSymbol(...)` allows you to easily create any symbol that is defined in your library. You provide the name of the symbol you wish to create, and it is returned. The plugin will search each library that has been added and return the first instance of the symbol that matches the name you provided. This function will return either an image symbol or a movie symbol.
 
 ```javascript
-import { FlumpPlugin } from 'phaser2-flump-plugin';
+import { FlumpPlugin } from '@redspace/phaser2-flump-plugin';
 
 const game = new Phaser.Game(800, 600, Phaser.AUTO, undefined, {
     init() {
@@ -320,7 +320,7 @@ We provide a [demo project][3] that provides examples of how to setup your proje
 1.0 - Added
 
 # License
-Phaser 2 Flump Plugin is release under the [GPL-3.0 license][7].
+Phaser 2 Flump Plugin is release under the [LGPL-3.0 license][7].
 
 # Created by
 Phaser 2 Flump Plugin was created by [REDspace][6].

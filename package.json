@@ -1,6 +1,6 @@
 {
   "name": "@redspace/phaser2-flump-plugin",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "",
   "main": "./dist/phaser2-flump-plugin.min.js",
   "dependencies": {},

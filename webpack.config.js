@@ -6,7 +6,9 @@ module.exports = env => {
         entry: path.join(__dirname, "./src/index.js"),
         output: {
             path: path.join(__dirname, "build"),
-            filename: env.prod ? "phaser2-flump-plugin.min.js" : "phaser2-flump-plugin.js"
+            filename: env.prod ? "phaser2-flump-plugin.min.js" : "phaser2-flump-plugin.js",
+            library: "phaser-flump-plugin",
+            libraryTarget: "umd"
         },
         module: {
             rules: [
