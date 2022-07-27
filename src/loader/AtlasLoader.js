@@ -14,6 +14,11 @@ export function atlasLoader(key, libraryJson, textureUrls, overwrite) {
     textureUrls.forEach(url => {
         const extension = url.substring(url.lastIndexOf("."));
         const file = url.substring(url.lastIndexOf("/") + 1);
+        let fileForKey = file
+
+        // If the image URL contains any query params, strip them from the filename used in the image key
+        if (file.indexOf('?') > -1) fileForKey = file.split('?')[0]
+
         this.addToFileList("image", `${key}/${file}`, url, undefined, overwrite, extension);
     });
     this.addToFileList("json", key, libraryJson, undefined, overwrite, ".json");
